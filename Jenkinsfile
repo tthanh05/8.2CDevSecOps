@@ -1,11 +1,13 @@
 pipeline {
-  agent { docker { image 'node:18' } }   // uses Node inside Docker; no local Node needed
+  agent any
+  tools { nodejs 'node18' }  // uses NodeJS plugin auto-install
+
   stages {
     stage('Checkout') {
       steps {
         git branch: 'main',
             url: 'https://github.com/tthanh05/8.2CDevSecOps.git',
-            credentialsId: 'gh-pat'      // remove this if repo is public
+            credentialsId: 'gh-pat'   // remove if repo is public
       }
     }
     stage('Install Dependencies') { steps { sh 'npm install' } }
@@ -13,6 +15,7 @@ pipeline {
     stage('Coverage')             { steps { sh 'npm run coverage || true' } }
     stage('NPM Audit')            { steps { sh 'npm audit || true' } }
   }
+
   post {
     always {
       archiveArtifacts artifacts: '**/coverage*/**', allowEmptyArchive: true
